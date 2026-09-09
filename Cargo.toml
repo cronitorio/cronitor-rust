@@ -1,0 +1,26 @@
+[package]
+name = "cronitor"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Official Rust SDK for Cronitor: job monitoring, telemetry pings and monitor configuration"
+license = "MIT"
+repository = "https://github.com/cronitorio/cronitor-rust"
+homepage = "https://cronitor.io"
+documentation = "https://docs.rs/cronitor"
+readme = "README.md"
+keywords = ["cronitor", "monitoring", "cron", "heartbeat", "telemetry"]
+categories = ["development-tools", "web-programming::http-client"]
+
+[dependencies]
+ureq = { version = "2.10", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+log = "0.4"
+hostname = "0.4"
+
+[dev-dependencies]
+httpmock = "0.7"
+env_logger = "0.11"

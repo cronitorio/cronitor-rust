@@ -1,0 +1,38 @@
+---
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-version: ["1.75", "stable", "beta"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust ${{ matrix.rust-version }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust-version }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Check formatting
+        if: matrix.rust-version == 'stable'
+        run: cargo fmt --check
+      - name: Clippy
+        if: matrix.rust-version == 'stable'
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Run Tests
+        run: cargo test --locked

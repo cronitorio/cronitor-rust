@@ -1,0 +1,4 @@
+# Keep `cargo update` from pulling in dependencies that require a compiler
+# newer than the crate's declared rust-version (1.75).
+[resolver]
+incompatible-rust-versions = "fallback"
