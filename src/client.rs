@@ -1,4 +1,7 @@
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
+
+use serde_json::Value;
 
 use crate::http::{basic_auth, DEFAULT_RETRY_BACKOFF};
 use crate::{Config, Monitor};
@@ -11,7 +14,8 @@ pub const DEFAULT_MONITOR_API_URL: &str = "https://cronitor.io/api/monitors";
 
 /// Entry point to the SDK: holds the [`Config`] and the API base URLs.
 ///
-/// A `Client` is cheap to clone; clones share the same HTTP connection pool.
+/// A `Client` is cheap to clone; clones share the same HTTP connection pool
+/// and queue of monitor attributes.
 #[derive(Debug, Clone)]
 pub struct Client {
     pub(crate) config: Config,
@@ -19,6 +23,7 @@ pub struct Client {
     pub(crate) monitor_api_url: String,
     pub(crate) retry_backoff: Duration,
     pub(crate) agent: ureq::Agent,
+    pub(crate) pending_attributes: Arc<Mutex<Vec<Value>>>,
 }
 
 impl Default for Client {
@@ -37,6 +42,7 @@ impl Client {
             monitor_api_url: DEFAULT_MONITOR_API_URL.to_string(),
             retry_backoff: DEFAULT_RETRY_BACKOFF,
             agent: ureq::AgentBuilder::new().build(),
+            pending_attributes: Arc::new(Mutex::new(Vec::new())),
         }
     }
 

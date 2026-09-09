@@ -26,6 +26,7 @@ mod config;
 mod data;
 mod error;
 mod http;
+mod job;
 mod monitor;
 
 pub use api::{ListOptions, PutOptions};
@@ -34,4 +35,5 @@ pub use config::{Config, DEFAULT_TIMEOUT};
 pub use data::MonitorData;
 pub use error::{Error, Result};
 pub use http::USER_AGENT;
+pub use job::JobOptions;
 pub use monitor::{Monitor, PingOptions, State};
