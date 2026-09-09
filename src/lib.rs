@@ -20,6 +20,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+mod api;
 mod client;
 mod config;
 mod data;
@@ -27,6 +28,7 @@ mod error;
 mod http;
 mod monitor;
 
+pub use api::{ListOptions, PutOptions};
 pub use client::{Client, DEFAULT_MONITOR_API_URL, DEFAULT_PING_BASE_URL};
 pub use config::{Config, DEFAULT_TIMEOUT};
 pub use data::MonitorData;

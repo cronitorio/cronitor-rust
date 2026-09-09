@@ -144,6 +144,14 @@ impl Monitor {
         }
     }
 
+    /// A monitor handle pre-populated with a document from the Monitor API.
+    pub(crate) fn with_data(client: Client, data: MonitorData) -> Self {
+        let key = data.key().unwrap_or_default().to_string();
+        let mut monitor = Self::new(client, key);
+        monitor.data = Some(data);
+        monitor
+    }
+
     /// The monitor key.
     pub fn key(&self) -> &str {
         &self.key
