@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::http::DEFAULT_RETRY_BACKOFF;
+use crate::http::{basic_auth, DEFAULT_RETRY_BACKOFF};
 use crate::{Config, Monitor};
 
 /// Default base URL for telemetry pings; the API key and monitor key are appended.
@@ -82,6 +82,31 @@ impl Client {
     /// A [`Monitor`] handle for `key`, sharing this client's configuration.
     pub fn monitor(&self, key: impl Into<String>) -> Monitor {
         Monitor::new(self.clone(), key)
+    }
+
+    /// Build an authenticated Monitor API request with the standard headers.
+    pub(crate) fn api_request(
+        &self,
+        method: &str,
+        url: &str,
+        api_key: &str,
+        api_version: Option<&str>,
+        timeout: Duration,
+    ) -> ureq::Request {
+        let mut req = self
+            .agent
+            .request(method, url)
+            .timeout(timeout)
+            .set("Authorization", &basic_auth(api_key));
+        if let Some(version) = api_version {
+            req = req.set("Cronitor-Version", version);
+        }
+        req
+    }
+
+    /// URL of a single monitor on the Monitor API.
+    pub(crate) fn monitor_url(&self, key: &str) -> String {
+        format!("{}/{}", self.monitor_api_url, key)
     }
 }
 

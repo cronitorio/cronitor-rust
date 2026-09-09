@@ -22,12 +22,14 @@
 
 mod client;
 mod config;
+mod data;
 mod error;
 mod http;
 mod monitor;
 
 pub use client::{Client, DEFAULT_MONITOR_API_URL, DEFAULT_PING_BASE_URL};
 pub use config::{Config, DEFAULT_TIMEOUT};
+pub use data::MonitorData;
 pub use error::{Error, Result};
 pub use http::USER_AGENT;
 pub use monitor::{Monitor, PingOptions, State};

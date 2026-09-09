@@ -1,7 +1,7 @@
 use std::fmt;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use crate::{Client, Error, Result};
+use crate::{Client, Error, MonitorData, Result};
 
 /// Timeout for telemetry pings.
 const PING_TIMEOUT: Duration = Duration::from_secs(5);
@@ -129,6 +129,7 @@ pub struct Monitor {
     api_key: Option<String>,
     api_version: Option<String>,
     env: Option<String>,
+    data: Option<MonitorData>,
 }
 
 impl Monitor {
@@ -139,6 +140,7 @@ impl Monitor {
             api_key: None,
             api_version: None,
             env: None,
+            data: None,
         }
     }
 
@@ -217,6 +219,100 @@ impl Monitor {
     /// `ping(PingOptions::new().state(State::Ok))`.
     pub fn ok(&self) -> Result<()> {
         self.ping(PingOptions::new().state(State::Ok))
+    }
+
+    /// Pause alerting for `hours` hours (`0` resumes alerting).
+    ///
+    /// If no API key is configured an error is logged and `Ok(())` is
+    /// returned without sending anything.
+    pub fn pause(&self, hours: u32) -> Result<()> {
+        let Some(api_key) = self.api_key() else {
+            log::error!(
+                "No API key detected. Set CRONITOR_API_KEY, Config::with_api_key or Monitor::with_api_key."
+            );
+            return Ok(());
+        };
+        let url = format!("{}/pause/{}", self.client.monitor_url(&self.key), hours);
+        let req = self
+            .client
+            .api_request("GET", &url, api_key, self.api_version(), PING_TIMEOUT);
+        let resp = self.client.send(req, None)?;
+        if (200..300).contains(&resp.status) {
+            Ok(())
+        } else {
+            Err(Error::Api(format!(
+                "Unexpected response {} pausing '{}': {}",
+                resp.status, self.key, resp.body
+            )))
+        }
+    }
+
+    /// Resume alerting; equivalent to `pause(0)`.
+    pub fn unpause(&self) -> Result<()> {
+        self.pause(0)
+    }
+
+    /// Delete the monitor.
+    ///
+    /// Returns [`Error::MonitorNotFound`] if it does not exist.
+    pub fn delete(&self) -> Result<()> {
+        let api_key = self.require_api_key()?;
+        let req = self.client.api_request(
+            "DELETE",
+            &self.client.monitor_url(&self.key),
+            api_key,
+            self.api_version(),
+            self.client.config.timeout(),
+        );
+        let resp = self.client.send(req, None)?;
+        match resp.status {
+            204 => Ok(()),
+            404 => Err(Error::MonitorNotFound(self.key.clone())),
+            status => Err(Error::Api(format!(
+                "An unexpected error occurred when deleting '{}': {} {}",
+                self.key, status, resp.body
+            ))),
+        }
+    }
+
+    /// Fetch the monitor document from the Monitor API.
+    ///
+    /// Returns [`Error::MonitorNotFound`] if it does not exist and
+    /// [`Error::Authentication`] if no API key is configured.
+    pub fn fetch(&self) -> Result<MonitorData> {
+        let api_key = self.require_api_key()?;
+        let req = self.client.api_request(
+            "GET",
+            &self.client.monitor_url(&self.key),
+            api_key,
+            self.api_version(),
+            self.client.config.timeout(),
+        );
+        let resp = self.client.send(req, None)?;
+        match resp.status {
+            200 => Ok(MonitorData::new(serde_json::from_str(&resp.body)?)),
+            404 => Err(Error::MonitorNotFound(self.key.clone())),
+            status => Err(Error::Api(format!(
+                "Unexpected error fetching '{}': {} {}",
+                self.key, status, resp.body
+            ))),
+        }
+    }
+
+    /// The monitor document, if this handle was returned by
+    /// [`Client::list`] or [`Client::put`]. Use [`Monitor::fetch`] to load it
+    /// from the API.
+    pub fn data(&self) -> Option<&MonitorData> {
+        self.data.as_ref()
+    }
+
+    fn require_api_key(&self) -> Result<&str> {
+        self.api_key().ok_or_else(|| {
+            Error::Authentication(
+                "No api_key detected. Set CRONITOR_API_KEY, Config::with_api_key or Monitor::with_api_key."
+                    .to_string(),
+            )
+        })
     }
 }
 
