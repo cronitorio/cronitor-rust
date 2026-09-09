@@ -1,5 +1,5 @@
 [package]
-name = "cronitor"
+name = "cronitor-sdk"
 version = "1.0.0"
 edition = "2021"
 rust-version = "1.75"
@@ -7,10 +7,13 @@ description = "Official Rust SDK for Cronitor: job monitoring, telemetry pings a
 license = "MIT"
 repository = "https://github.com/cronitorio/cronitor-rust"
 homepage = "https://cronitor.io"
-documentation = "https://docs.rs/cronitor"
+documentation = "https://docs.rs/cronitor-sdk"
 readme = "README.md"
 keywords = ["cronitor", "monitoring", "cron", "heartbeat", "telemetry"]
 categories = ["development-tools", "web-programming::http-client"]
+
+[lib]
+name = "cronitor"
 
 [dependencies]
 ureq = { version = "2.10", features = ["json"] }

@@ -16,15 +16,17 @@ In this guide:
 ## Installation
 
 ```
-cargo add cronitor
+cargo add cronitor-sdk
 ```
 
 or add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-cronitor = "1"
+cronitor-sdk = "1"
 ```
+
+The package is published as `cronitor-sdk` but the library is named `cronitor`, so import it as `use cronitor::...`.
 
 The crate requires Rust 1.75 or later. The API is blocking; from an async runtime call it through `tokio::task::spawn_blocking` (or your runtime's equivalent):
 

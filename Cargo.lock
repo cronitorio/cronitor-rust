@@ -395,7 +395,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cronitor"
+name = "cronitor-sdk"
 version = "1.0.0"
 dependencies = [
  "env_logger",
