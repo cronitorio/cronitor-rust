@@ -28,6 +28,7 @@ mod error;
 mod http;
 mod job;
 mod monitor;
+mod yaml_config;
 
 pub use api::{ListOptions, PutOptions};
 pub use client::{Client, DEFAULT_MONITOR_API_URL, DEFAULT_PING_BASE_URL};
@@ -37,3 +38,4 @@ pub use error::{Error, Result};
 pub use http::USER_AGENT;
 pub use job::JobOptions;
 pub use monitor::{Monitor, PingOptions, State};
+pub use yaml_config::{ConfigSummary, DEFAULT_CONFIG_PATH};

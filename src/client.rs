@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -15,7 +16,7 @@ pub const DEFAULT_MONITOR_API_URL: &str = "https://cronitor.io/api/monitors";
 /// Entry point to the SDK: holds the [`Config`] and the API base URLs.
 ///
 /// A `Client` is cheap to clone; clones share the same HTTP connection pool
-/// and queue of monitor attributes.
+/// queue of monitor attributes and config path.
 #[derive(Debug, Clone)]
 pub struct Client {
     pub(crate) config: Config,
@@ -24,6 +25,7 @@ pub struct Client {
     pub(crate) retry_backoff: Duration,
     pub(crate) agent: ureq::Agent,
     pub(crate) pending_attributes: Arc<Mutex<Vec<Value>>>,
+    pub(crate) config_path: Arc<Mutex<Option<PathBuf>>>,
 }
 
 impl Default for Client {
@@ -36,6 +38,7 @@ impl Default for Client {
 impl Client {
     /// Create a client from an explicit [`Config`].
     pub fn new(config: Config) -> Self {
+        let config_path = config.config_path().map(PathBuf::from);
         Self {
             config,
             ping_base_url: DEFAULT_PING_BASE_URL.to_string(),
@@ -43,6 +46,7 @@ impl Client {
             retry_backoff: DEFAULT_RETRY_BACKOFF,
             agent: ureq::AgentBuilder::new().build(),
             pending_attributes: Arc::new(Mutex::new(Vec::new())),
+            config_path: Arc::new(Mutex::new(config_path)),
         }
     }
 
