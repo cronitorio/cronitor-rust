@@ -33,7 +33,7 @@ fn fetch_returns_parsed_monitor_with_auth_and_version_headers() {
         when.method(GET)
             .path("/api/monitors/send-invoices")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust")
+            .header("User-Agent", cronitor::USER_AGENT)
             .header("Cronitor-Version", "2020-10-01");
         then.status(200).json_body(body.clone());
     });
@@ -137,7 +137,7 @@ fn delete_maps_status_codes() {
         when.method(DELETE)
             .path("/api/monitors/gone")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust");
+            .header("User-Agent", cronitor::USER_AGENT);
         then.status(204);
     });
     server.mock(|when, then| {
@@ -168,7 +168,7 @@ fn pause_and_unpause_hit_the_pause_endpoint() {
         when.method(GET)
             .path("/api/monitors/abc/pause/24")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust");
+            .header("User-Agent", cronitor::USER_AGENT);
         then.status(200);
     });
     let unpause = server.mock(|when, then| {

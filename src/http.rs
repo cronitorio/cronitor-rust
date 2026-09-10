@@ -6,7 +6,7 @@ use std::time::Duration;
 use crate::{Client, Result};
 
 /// `User-Agent` sent with every request.
-pub const USER_AGENT: &str = "cronitor-rust";
+pub const USER_AGENT: &str = concat!("cronitor-rust/", env!("CARGO_PKG_VERSION"));
 
 /// Number of retries after the initial attempt.
 pub(crate) const MAX_RETRIES: u32 = 3;

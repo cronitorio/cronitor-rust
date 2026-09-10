@@ -25,7 +25,7 @@ fn list_with_filters_sends_default_pagination() {
         when.method(GET)
             .path("/api/monitors")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust")
+            .header("User-Agent", cronitor::USER_AGENT)
             .query_param("type", "job")
             .query_param("group", "production")
             .query_param("page", "1")
@@ -209,7 +209,7 @@ fn put_sends_monitors_payload_without_rollback_by_default() {
         when.method(PUT)
             .path("/api/monitors")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust")
+            .header("User-Agent", cronitor::USER_AGENT)
             .header("Content-Type", "application/json")
             .json_body(json!({"monitors": [monitor("a-test_key"), monitor("another-test-key")]}));
         then.status(200)
@@ -399,7 +399,7 @@ fn as_yaml_returns_the_document_text() {
         when.method(GET)
             .path("/api/monitors.yaml")
             .header("Authorization", EXPECTED_AUTH)
-            .header("User-Agent", "cronitor-rust");
+            .header("User-Agent", cronitor::USER_AGENT);
         then.status(200)
             .body("jobs:\n  a:\n    schedule: '* * * * *'\n");
     });

@@ -16,7 +16,7 @@ fn ping_with_all_params_hits_exact_url_and_query() {
     let mock = server.mock(|when, then| {
         when.method(GET)
             .path(format!("/p/{FAKE_API_KEY}/{FAKE_KEY}"))
-            .header("User-Agent", "cronitor-rust")
+            .header("User-Agent", cronitor::USER_AGENT)
             .query_param("state", "run")
             .query_param("host", "foo")
             .query_param("message", "test message")
