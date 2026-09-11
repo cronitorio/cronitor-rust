@@ -107,9 +107,13 @@ monitor.ping(
         .message("") // message that will be displayed in alerts as well as monitor activity panel on your dashboard.
         .metric("duration", 100) // how long the job ran (complete|fail only). cronitor will calculate this when not provided
         .metric("count", 4500) // if your job is processing a number of items you can report a count
-        .metric("error_count", 10), // the number of errors that occurred while this job was running
+        .metric("error_count", 10) // the number of errors that occurred while this job was running
+        .metric("queue_depth", 12) // custom metrics use the same builder — any name is sent as metric=name:value
+        .metric("quality_score", 0.97),
 )?;
 ```
+
+Built-in names such as `duration`, `count`, and `error_count` are common, but `.metric(name, value)` accepts any name. Custom metrics (for example `queue_depth` or `quality_score`) are forwarded as `metric=name:value` on the ping, the same way as the built-ins.
 
 If no API key is configured, `ping` logs an error (through the [`log`](https://docs.rs/log) facade) and returns `Ok(())` without sending anything, so a missing key never breaks your job.
 
